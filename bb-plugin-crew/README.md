@@ -92,6 +92,11 @@ The plan warns with `review-reads-author` when a member whose role mentions
 review or check has `can_read` or `works_with` on a member that assigns it
 work; it is only a warning, apply still runs.
 
+For providers exposing a session mode (such as OpenCode), members can set
+`mode: plan`, `mode: build`, or another mode supported by that provider.
+Crew passes this choice when creating the thread. To change the mode of an
+existing member, start a new shift with `bb crew apply crew.yaml --fresh dev-check`.
+
 `skills:` and `graphs:` are optional on crew, group and member, and inherit
 the same way `instructions` does (crew → group → member, each name kept
 once). `skills:` names skills to prefer, resolved against `~/.bb/skills`,

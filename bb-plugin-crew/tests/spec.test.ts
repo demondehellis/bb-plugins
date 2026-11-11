@@ -59,6 +59,16 @@ describe("crew file validation", () => {
     expect(codes(bad)).toContain("schema");
   });
 
+  it("passes an optional OpenCode session mode through member configuration", () => {
+    const spec = base();
+    spec.groups[1]!.members[0]!.mode = "plan";
+    const members = validateCrew(spec).members;
+    expect(members.find((m) => m.key === "dev-owner")!.mode).toBe("plan");
+    expect(members.find((m) => m.key === "dev-check")!.mode).toBeNull();
+    spec.groups[1]!.members[0]!.mode = "";
+    expect(codes(spec)).toContain("schema");
+  });
+
   it("rejects a schema violation (unknown permission)", () => {
     const spec = base();
     spec.permissions = "yolo" as never;

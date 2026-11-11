@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import YAML from "yaml";
 import { validateCrew } from "../lib/spec";
 import { memberRowId } from "../lib/store";
 import { ApplyRefused, kickoffBrief } from "../lib/sync";
@@ -26,6 +27,16 @@ describe("apply", () => {
     expect(spawns.every((s) => s.providerId === "claude-code" && s.model === "claude-haiku-4-5-20251001")).toBe(true);
     expect(spawns[1]!.metadata).toMatchObject({ crew: "trio", member: "dev-impl", address: "dev-impl@trio", shift: 1, lead: false });
     expect(typeof spawns[1]!.metadata.opId).toBe("string");
+  });
+
+  it("passes the member session mode only when configured", async () => {
+    const { service, port } = setup();
+    const spec = YAML.parse(trioYaml());
+    spec.groups[1].members[1].mode = "plan";
+    await service.apply(PROJECT, YAML.stringify(spec));
+    const spawns = port.calls.filter((c) => c.method === "spawn").map((c) => c.args as SpawnRequest);
+    expect(spawns.find((s) => s.title === "dev-review@trio")!.mode).toBe("plan");
+    expect(spawns.find((s) => s.title === "dev-impl@trio")!.mode).toBeNull();
   });
 
   it("environment auto: writer gets a worktree, reader reuses the lead's environment", async () => {

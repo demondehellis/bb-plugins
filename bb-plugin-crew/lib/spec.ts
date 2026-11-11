@@ -62,6 +62,7 @@ const memberSchema = z
     serviceTier: z.enum(SERVICE_TIERS).optional(),
     context: z.enum(CONTEXT_MODES).optional(),
     role: z.string().default(""),
+    mode: z.string().min(1).optional(),
     instructions: z.string().optional(),
     permissions: permissionSchema.optional(),
     environment: environmentSchema.optional(),
@@ -210,6 +211,7 @@ export type ResolvedMember = {
   environment: EnvironmentSpec;
   placement: Placement;
   role: string;
+  mode: string | null;
   /** Crew → group → member instructions, most general first. */
   instructions: string[];
   skills: string[];
@@ -394,6 +396,7 @@ export function validateCrew(input: string | unknown, options: ValidateOptions =
       environment,
       placement: placementFor(lead, permissions, environment, spec.environment),
       role: member.role,
+      mode: member.mode ?? null,
       instructions: [spec.instructions, group.instructions, member.instructions].filter(
         (text): text is string => typeof text === "string" && text.trim() !== "",
       ),

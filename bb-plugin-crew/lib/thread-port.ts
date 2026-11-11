@@ -96,6 +96,7 @@ export type SpawnRequest = {
   title: string;
   providerId: string;
   model: string;
+  mode?: string | null;
   reasoningLevel?: string | null;
   serviceTier?: string | null;
   permissions: Permission;
@@ -304,6 +305,7 @@ export function createSdkThreadPort(bb: BbPluginApi, options: { backoff?: Backof
             visibility: "visible",
             providerId: request.providerId,
             model: request.model,
+            ...(request.mode ? { sessionOptions: { mode: request.mode } } : {}),
             permissionMode: permissionModeFor(request.permissions),
             // Without "explicit" BB treats the values as a client preference
             // and may silently pick the project default instead (§6).
